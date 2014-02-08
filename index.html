@@ -1,0 +1,132 @@
+<html>
+  <head>
+	<!--<script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>-->
+    <script src='../puzz/quintus-all.js'></script>
+	<style>
+		canvas { background-color: grey; }
+	</style>
+  </head>
+   <body>
+     <script>
+		// This game uses spritesheet.png from:
+	 	// http://opengameart.org/content/platformer-art-pixel-redux
+		var Q = Quintus()
+			.include("Sprites, Scenes, Input, 2D, Anim, Touch, UI, TMX")
+			.setup({maximize: true})
+			.controls();
+
+		Q.setImageSmoothing(false);
+
+		// World settings
+		//
+		Q.gravityX = 0.0;
+		Q.gravityY = 0.0;
+
+
+		Q.Sprite.extend("CreatureSprite",
+		{
+			init: function(p)
+			{
+				p.sheet = "tinytilez";
+				p.type = Q.SPRITE_PLAYER;
+				p.collisionMask = Q.SPRITE_PLAYER;// | Q.SPRITE_POWERUP;
+				this._super(p);
+			}
+		});
+
+
+		Q.Sprite.extend("ObjectSprite",
+		{
+			init: function(p)
+			{
+				p.sheet = "tinytilez";
+				p.sensor = true;
+				this._super(p);
+			}
+		});
+
+
+		Q.CreatureSprite.extend("Player",
+		{
+			init: function(p)
+			{
+				p.frame = 48;
+				p.walk_speed = 50;
+				this._super(p);
+
+				this.add("2d");
+			},
+
+			step: function(delta)
+			{
+				     if(Q.inputs["left"])  { this.p.x -= this.p.walk_speed * delta; }
+				else if(Q.inputs["right"]) { this.p.x += this.p.walk_speed * delta; }
+
+				     if(Q.inputs["up"])   { this.p.y -= this.p.walk_speed * delta; }
+				else if(Q.inputs["down"]) { this.p.y += this.p.walk_speed * delta; }
+			}
+		});
+
+
+		Q.ObjectSprite.extend("Sword",
+		{
+			init: function(p)
+			{
+				p.frame = 42;
+				this._super(p);
+			}
+		});
+
+		Q.CreatureSprite.extend("Enemy",
+		{
+			init: function(p)
+			{
+				p.frame = 52;
+				this._super(p);
+			}
+		});
+
+		Q.ObjectSprite.extend("PowerStone",
+		{
+			init: function(p)
+			{
+				p.frame = 86;
+				this._super(p);
+			}
+		});
+
+
+		Q.scene("rpgmap",function(stage) {
+			Q.stageTMX("rpgmap.tmx",stage);
+
+			stage.add("viewport");
+
+			// Find player from TMX scene
+			var player = Q("Player").first();
+			
+			stage.viewport.scale = 3.0;
+		    //stage.viewport.follow(player);
+		});
+
+
+
+
+		// Load assets and launch the first scene to start the game
+		//
+		assets = "rpgmap.tmx";
+
+		Q.loadTMX(assets , function()
+		{
+			Q.sheet("tinytilez", "soundsheett_vFinal.png", {
+				tileW: 8,
+				tileH: 8,
+			});
+
+
+			Q.stageScene("rpgmap");
+		});
+
+     </script>
+   </body>
+</html>
+
