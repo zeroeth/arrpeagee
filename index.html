@@ -22,33 +22,51 @@
 		Q.gravityY = 0.0;
 
 
-		Q.Sprite.extend("CreatureSprite",
+		// Every sprite comes from this sheet, shared properties are placed on the 'parent' class being extended
+		//
+		Q.Sprite.extend("RPGTileSprite",
 		{
 			init: function(p)
 			{
-				p.sheet = "tinytilez";
-				p.type = Q.SPRITE_PLAYER;
-				p.collisionMask = Q.SPRITE_PLAYER;// | Q.SPRITE_POWERUP;
+				p.sheet = "tinymaptiles";
 				this._super(p);
 			}
 		});
 
 
-		Q.Sprite.extend("ObjectSprite",
+		Q.RPGTileSprite.extend("Creature",
 		{
 			init: function(p)
 			{
-				p.sheet = "tinytilez";
+				this._super(p);
+			}
+		});
+
+		Q.RPGTileSprite.extend("WalkableObject",
+		{
+			init: function(p)
+			{
+				// Sensor means allow collision detection but don't block
 				p.sensor = true;
 				this._super(p);
 			}
+
 		});
 
-
-		Q.CreatureSprite.extend("Player",
+		Q.RPGTileSprite.extend("RPGObject",
 		{
 			init: function(p)
 			{
+				this._super(p);
+			}
+		});
+
+
+		Q.Creature.extend("Player",
+		{
+			init: function(p)
+			{
+				// The 48th square in the tile sheet
 				p.frame = 48;
 				p.walk_speed = 50;
 				this._super(p);
@@ -61,13 +79,15 @@
 				     if(Q.inputs["left"])  { this.p.x -= this.p.walk_speed * delta; }
 				else if(Q.inputs["right"]) { this.p.x += this.p.walk_speed * delta; }
 
-				     if(Q.inputs["up"])   { this.p.y -= this.p.walk_speed * delta; }
-				else if(Q.inputs["down"]) { this.p.y += this.p.walk_speed * delta; }
+				     if(Q.inputs["up"])    { this.p.y -= this.p.walk_speed * delta; }
+				else if(Q.inputs["down"])  { this.p.y += this.p.walk_speed * delta; }
 			}
+			
+			// TODO Trigger sword pickup
 		});
 
 
-		Q.ObjectSprite.extend("Sword",
+		Q.RPGObject.extend("Sword",
 		{
 			init: function(p)
 			{
@@ -76,7 +96,8 @@
 			}
 		});
 
-		Q.CreatureSprite.extend("Enemy",
+
+		Q.Creature.extend("Enemy",
 		{
 			init: function(p)
 			{
@@ -85,26 +106,27 @@
 			}
 		});
 
-		Q.ObjectSprite.extend("PowerStone",
+		Q.WalkableObject.extend("PowerStone",
 		{
 			init: function(p)
 			{
 				p.frame = 86;
 				this._super(p);
 			}
+
+			// TODO Handle health regen and FX
 		});
 
 
 		Q.scene("rpgmap",function(stage) {
-			Q.stageTMX("rpgmap.tmx",stage);
+
+			// Load a Tiled TMX file which contains the level and game objects.
+			// NOTE look at the properties of the tiles in tiled. They specify which 'game sprites' are used in quintus
+			//      And if the tile layer is collidable with the player or not
+			Q.stageTMX("rpgmap.tmx", stage);
 
 			stage.add("viewport");
-
-			// Find player from TMX scene
-			var player = Q("Player").first();
-			
 			stage.viewport.scale = 3.0;
-		    //stage.viewport.follow(player);
 		});
 
 
@@ -116,12 +138,6 @@
 
 		Q.loadTMX(assets , function()
 		{
-			Q.sheet("tinytilez", "soundsheett_vFinal.png", {
-				tileW: 8,
-				tileH: 8,
-			});
-
-
 			Q.stageScene("rpgmap");
 		});
 
