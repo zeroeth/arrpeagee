@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="8" tileheight="8">
  <tileset firstgid="1" name="tinymaptiles" tilewidth="8" tileheight="8">
-  <image source="../../other/game resources/soundsheett_vFinal.png" width="48" height="184"/>
+  <image source="../images/soundsheett_vFinal.png" width="48" height="184"/>
   <tile id="39">
    <properties>
     <property name="z" value="-100"/>
